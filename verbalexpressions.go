@@ -99,7 +99,7 @@ func (v *VerbalExpression) Then(s string) *VerbalExpression {
 // Any accepts caracters to be matched
 // Example:
 //		s := "foo1 foo5 foobar"
-//		v := New().Find("foo").Any("1234567890").v.Regex().FindAllString(s, -1)
+//		v := New().Find("foo").Any("1234567890").Regex().FindAllString(s, -1)
 //		[foo1 foo5]
 func (v *VerbalExpression) Any(s string) *VerbalExpression {
 	return v.add(`([` + quote(s) + `])`)
