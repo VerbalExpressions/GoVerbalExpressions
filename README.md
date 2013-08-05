@@ -5,6 +5,9 @@ Go VerbalExpressions implementation
 
 VerbalExpression is a concept to help building difficult regular expressions.
 
+See online doc here: http://godoc.org/github.com/VerbalExpressions/GoVerbalExpressions
+
+
 ## Other Implementations
 You can see an up to date list of all ports in our [organization](https://github.com/VerbalExpressions).
 - [Javascript](https://github.com/jehna/VerbalExpressions)
