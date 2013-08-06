@@ -12,7 +12,6 @@ import (
 
 // VerbalExpression structure to create expression
 type VerbalExpression struct {
-	re         *regexp.Regexp
 	expression string
 	anycase    bool
 	oneline    bool
@@ -48,7 +47,6 @@ func tostring(i interface{}) string {
 func New() *VerbalExpression {
 	r := new(VerbalExpression)
 	r.anycase, r.oneline = false, false
-	r.re = &regexp.Regexp{}
 	return r
 }
 
