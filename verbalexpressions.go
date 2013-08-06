@@ -176,11 +176,11 @@ func (v *VerbalExpression) SearchOneLine(oneline bool) *VerbalExpression {
 func (v *VerbalExpression) Regex() *regexp.Regexp {
 	modifier := ""
 	if v.anycase {
-		modifier = "i"
+		modifier += "i"
 	}
 
 	if v.oneline {
-		modifier = "m"
+		modifier += "m"
 	}
 
 	if len(modifier) > 0 {
