@@ -1,3 +1,6 @@
+// Copyright 2013 Patrice FERLET
+// Ue of this source code is governed by MIT-style
+// license that can be found in the LICENSE file
 package verbalexpressions
 
 import "testing"
@@ -25,8 +28,8 @@ func TestRange(t *testing.T) {
 
 	exp := "abcdef 123"
 
-	v := New().Range("a", "z", 0, 9, " ")
-	if v.Regex().String() != "[a-z0-9 ]" {
+	v := New().Range("a", "z", 0, 9)
+	if v.Regex().String() != "[a-z0-9]" {
 		t.Errorf("%s is not [a-z0-9 ]", v.Regex())
 	}
 	if !v.Test(exp) {
@@ -37,6 +40,18 @@ func TestRange(t *testing.T) {
 		t.Errorf("%v regexp should not match %s", v.Regex(), exp)
 	}
 
+}
+
+func TestPanicOnRangeOddParams(t *testing.T) {
+
+	defer func() {
+		if r := recover(); r != nil {
+			t.Logf("panic accepted: %s", r)
+		}
+	}()
+
+	New().Range("a", "z", 0, 9, 10)
+	t.Errorf("Call must panic !")
 }
 
 func TestOneLine(t *testing.T) {
@@ -84,6 +99,20 @@ func TestAny(t *testing.T) {
 	res := v.Regex().FindAllString(s, -1)
 	if len(res) != 2 {
 		t.Errorf("len(res) : %d isn't 2", len(res))
+	}
+
+}
+
+func TestReplace(t *testing.T) {
+
+	s := "foomode barmode themodebaz"
+	expect := "foochanged barchanged thechangedbaz"
+
+	v := New().Find("mode")
+	res := v.Replace(s, "changed")
+
+	if res != expect {
+		t.Errorf("Replacement hasn't worked as expected %s != %s", res, expect)
 	}
 
 }

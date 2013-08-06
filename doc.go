@@ -10,7 +10,6 @@ That's why we named package "verbalexpressions" instead of "GoVerbalExpressions"
 
 This is very important !
 
-
 Using verbalexpressions:
 
 Use "New()" factory then you can chain calls. Go syntax allows you to set new line after seperators:
