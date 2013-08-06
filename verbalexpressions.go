@@ -43,6 +43,7 @@ func tostring(i interface{}) string {
 
 // Instanciate a new VerbalExpression. You should use this method to
 // initalize some internal var.
+//
 // Example:
 //		v := verbalexpression.New().Find("foo")
 func New() *VerbalExpression {
@@ -127,6 +128,7 @@ func (v *VerbalExpression) Then(s string) *VerbalExpression {
 }
 
 // Any accepts caracters to be matched
+//
 // Example:
 //		s := "foo1 foo5 foobar"
 //		v := New().Find("foo").Any("1234567890").Regex().FindAllString(s, -1)
@@ -152,9 +154,12 @@ func (v *VerbalExpression) Br() *VerbalExpression {
 
 // Range accepts an even number of arguments. Each pair of values defines start and end of range.
 // Think like this: Range(from, to [, from, to ...])
+//
 // Example:
 //		s := "This 1 is 55 a TEST"
 //		v := verbalexpressions.New().Range("a","z",0,9)
+//		res := v.Regex().FindAllString()
+//		[his 1 is 55 a]
 func (v *VerbalExpression) Range(args ...interface{}) *VerbalExpression {
 	if len(args)%2 != 0 {
 		log.Panicf("Range: not even args number")
@@ -185,6 +190,7 @@ func (v *VerbalExpression) Word() *VerbalExpression {
 }
 
 // Or, chains a alternate expression
+//
 // Example:
 //		v := Verbalexpression.New().
 //				Find("foobarbaz").
@@ -196,22 +202,24 @@ func (v *VerbalExpression) Or() *VerbalExpression {
 	return v.add(")|(?:")
 }
 
-// WithAnyCase ask verbalexpressions to match with or without case sensitivity
+// WithAnyCase asks verbalexpressions to match with or without case sensitivity
 func (v *VerbalExpression) WithAnyCase(sensitive bool) *VerbalExpression {
+	if !sensitive {
+		return v.removemodifier("i")
+	}
 	return v.addmodifier("i")
 }
 
-// SearchOneLine deactivate "multiline" mode if true
+// SearchOneLine deactivates "multiline" mode if online argument is true
 // Default is false
 func (v *VerbalExpression) SearchOneLine(oneline bool) *VerbalExpression {
 	if oneline {
 		return v.removemodifier("m")
-	} else {
-		return v.addmodifier("m")
 	}
+	return v.addmodifier("m")
 }
 
-// Regex return the regular expression to use to test on string.
+// Regex returns the regular expression to use to test on string.
 func (v *VerbalExpression) Regex() *regexp.Regexp {
 	modifier := ""
 	if len(v.modifiers) > 0 {
@@ -236,6 +244,7 @@ func (v *VerbalExpression) Replace(src string, dst string) string {
 
 // Returns a slice of results from captures. If you didn't apply BeginCapture() and EnCapture(), the slices
 // will return slice of []string where []string is length 1, and 0 index is the global capture
+//
 // Example:
 //		s:="This should get barsystem and whatever..."
 //		// get "bar" followed by a word
@@ -246,7 +255,9 @@ func (v *VerbalExpression) Replace(src string, dst string) string {
 //
 //		res := v.Captures(s)
 //		fmt.Println(res)
-//		[["This should get barsystem", "barsystem"]]
+//		[
+//			["This should get barsystem", "barsystem"] // 0: global capture, 1: catpure 1
+//		]
 //
 // So, to range results, you can do:
 //		for _, captures := range res {
