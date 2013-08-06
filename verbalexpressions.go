@@ -1,10 +1,10 @@
 package verbalexpressions
 
 import (
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
-	"log"
 )
 
 // VerbalExpression structure to create expression
@@ -27,7 +27,7 @@ func tostring(i interface{}) string {
 	case string:
 		r = x
 	case int64:
-		r =  strconv.FormatInt(x, 64)
+		r = strconv.FormatInt(x, 64)
 	case uint:
 		r = strconv.FormatUint(uint64(x), 64)
 	case int:
@@ -119,7 +119,6 @@ func (v *VerbalExpression) LineBreak() *VerbalExpression {
 func (v *VerbalExpression) BR() *VerbalExpression {
 	return v.LineBreak()
 }
-
 
 // Range accepts an even number of arguments. Each pair of values defines start and end of range.
 // Example:

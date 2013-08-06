@@ -26,7 +26,7 @@ func TestRange(t *testing.T) {
 	exp := "abcdef 123"
 
 	v := New().Range("a", "z", 0, 9, " ")
-	if v.Regex().String() != "[a-z0-9 ]"{
+	if v.Regex().String() != "[a-z0-9 ]" {
 		t.Errorf("%s is not [a-z0-9 ]", v.Regex())
 	}
 	if !v.Test(exp) {
@@ -56,7 +56,7 @@ func TestOneLine(t *testing.T) {
 	if len(res) != 3 {
 		t.Errorf("%v should be length 1, %d instead", res, len(res))
 	}
-	for _, r:= range res {
+	for _, r := range res {
 		if len(r) != 2 {
 			t.Errorf("%v should be length 2, %d instead", r, len(r))
 		}
@@ -65,27 +65,25 @@ func TestOneLine(t *testing.T) {
 
 func TestExcepting(t *testing.T) {
 
-		s := "This is a simple test"
-		v := New().AnythingBut("im").Regex().FindAllString(s, -1)
-		for _, st := range v {
-			if strings.Contains(st, "i") {
-				t.Errorf("%s should not find \"i\"", st)
-			}
-			if strings.Contains(st, "m") {
-				t.Errorf("%s should not find \"m\"", st)
-			}
+	s := "This is a simple test"
+	v := New().AnythingBut("im").Regex().FindAllString(s, -1)
+	for _, st := range v {
+		if strings.Contains(st, "i") {
+			t.Errorf("%s should not find \"i\"", st)
 		}
+		if strings.Contains(st, "m") {
+			t.Errorf("%s should not find \"m\"", st)
+		}
+	}
 }
 
+func TestAny(t *testing.T) {
 
-func TestAny (t *testing.T) {
-
-		s := "foo1 foo5 foobar"
-		v := New().Find("foo").Any("1234567890")
-		res := v.Regex().FindAllString(s, -1)
-		if len(res) != 2 {
-			t.Errorf("len(res) : %d isn't 2", len(res))
-		}
+	s := "foo1 foo5 foobar"
+	v := New().Find("foo").Any("1234567890")
+	res := v.Regex().FindAllString(s, -1)
+	if len(res) != 2 {
+		t.Errorf("len(res) : %d isn't 2", len(res))
+	}
 
 }
-
