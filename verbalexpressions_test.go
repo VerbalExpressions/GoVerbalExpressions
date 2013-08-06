@@ -1,3 +1,6 @@
+// Copyright 2013 Patrice FERLET
+// Ue of this source code is governed by MIT-style
+// license that can be found in the LICENSE file
 package verbalexpressions
 
 import "testing"
