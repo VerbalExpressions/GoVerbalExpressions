@@ -87,7 +87,8 @@ func (v *VerbalExpression) AnythingBut(s string) *VerbalExpression {
 // EndOfLine tells verbalexpressions to match a end of line.
 // Warning, to check multiple line, you must use SearchOneLine(true)
 func (v *VerbalExpression) EndOfLine() *VerbalExpression {
-	return v.add(`$`)
+	v.suffixes += "$"
+	return v
 }
 
 // Maybe will search string zero on more times
@@ -98,7 +99,8 @@ func (v *VerbalExpression) Maybe(s string) *VerbalExpression {
 // StartOfLine seeks the begining of a line. As EndOfLine you should use
 // SearchOneLine(true) to test multiple lines
 func (v *VerbalExpression) StartOfLine() *VerbalExpression {
-	return v.add(`^`)
+	v.prefixes += `^`
+	return v
 }
 
 // Find seeks string. The string MUST be there (unlike Maybe() method)
@@ -171,7 +173,9 @@ func (v *VerbalExpression) Word() *VerbalExpression {
 
 // Or, as the word is meaning...
 func (v *VerbalExpression) Or() *VerbalExpression {
-	return v.add("|")
+	v.prefixes += "(?:"
+	v.suffixes = ")" + v.suffixes
+	return v.add(")|(?:")
 }
 
 // WithAnyCase ask verbalexpressions to match with or without case sensitivity
@@ -201,7 +205,7 @@ func (v *VerbalExpression) Regex() *regexp.Regexp {
 		modifier = "(?" + modifier + ")"
 	}
 
-	return regexp.MustCompile(modifier + v.expression)
+	return regexp.MustCompile(modifier + v.prefixes + v.expression + v.suffixes)
 }
 
 /* proxy and helpers to regexp.Regexp functions */

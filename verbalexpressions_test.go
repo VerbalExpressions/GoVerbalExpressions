@@ -217,3 +217,27 @@ func TestCapturingSeveralGroups(t *testing.T) {
 	}
 
 }
+
+func TestORMethod(t *testing.T) {
+
+	s := "foobarbaz footestbaz foonobaz"
+	expected := []string{"foobarbaz", "footestbaz"}
+
+	v := New().Find("foobarbaz").Or().Find("footestbaz")
+	if !v.Test(s) {
+		t.Errorf("%s doesn't match %s", v.Regex(), s)
+	}
+	res := []string{}
+	res = v.Regex().FindAllString(s, -1)
+
+	if len(res) != 2 {
+		t.Errorf("%v is not length 2", res)
+	}
+
+	for i, r := range res {
+		if r != expected[i] {
+			t.Errorf("%s is not expected value: %s", r, expected[i])
+		}
+	}
+
+}
