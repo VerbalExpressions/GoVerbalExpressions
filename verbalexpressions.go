@@ -130,7 +130,7 @@ func (v *VerbalExpression) Range(args ...interface{}) *VerbalExpression {
 	for i := 0; i < len(args); i++ {
 		app += tostring(args[i])
 		if i%2 != 0 {
-			parts = append(parts, app)
+			parts = append(parts, quote(app))
 			app = ""
 		} else {
 			app += "-"
