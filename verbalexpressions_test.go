@@ -29,8 +29,8 @@ func TestRange(t *testing.T) {
 	exp := "abcdef 123"
 
 	v := New().Range("a", "z", 0, 9)
-	if v.Regex().String() != "[a-z0-9]" {
-		t.Errorf("%s is not [a-z0-9 ]", v.Regex())
+	if v.Regex().String() != "(?m)[a-z0-9]" {
+		t.Errorf("%s is not (?m)[a-z0-9]", v.Regex())
 	}
 	if !v.Test(exp) {
 		t.Errorf("%v regexp doesn't match %s", v.Regex(), exp)
@@ -45,19 +45,19 @@ func TestRange(t *testing.T) {
 func TestPanicOnRangeOddParams(t *testing.T) {
 
 	defer func() {
-		if r := recover(); r != nil {
-			t.Logf("panic accepted: %s", r)
+		// if no panic... the test fails
+		if r := recover(); r == nil {
+			t.Errorf("Call must panic !")
 		}
 	}()
 
 	New().Range("a", "z", 0, 9, 10)
-	t.Errorf("Call must panic !")
 }
 
 func TestOneLine(t *testing.T) {
 	s := "atlanta\narkansas\nalabama\narachnophobia"
 
-	v := New().SearchOneLine(false).Find("a").EndOfLine().Regex()
+	v := New().SearchOneLine(true).Find("a").EndOfLine().Regex()
 	res := v.FindAllStringIndex(s, -1)
 	if len(res) != 1 {
 		t.Errorf("%v should be length 1, %d instead", res, len(res))
@@ -66,7 +66,7 @@ func TestOneLine(t *testing.T) {
 		t.Errorf("%v should be length 2, %d instead", res[0], len(res[0]))
 	}
 
-	v = New().SearchOneLine(true).Find("a").EndOfLine().Regex()
+	v = New().SearchOneLine(false).Find("a").EndOfLine().Regex()
 	res = v.FindAllStringIndex(s, -1)
 	if len(res) != 3 {
 		t.Errorf("%v should be length 1, %d instead", res, len(res))

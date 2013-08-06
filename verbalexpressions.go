@@ -46,7 +46,7 @@ func tostring(i interface{}) string {
 //		v := verbalexpression.New().Find("foo")
 func New() *VerbalExpression {
 	r := new(VerbalExpression)
-	r.anycase, r.oneline = false, false
+	r.anycase, r.oneline = false, true
 	return r
 }
 
@@ -166,9 +166,10 @@ func (v *VerbalExpression) WithAnyCase(sensitive bool) *VerbalExpression {
 	return v
 }
 
-// SearchOneLine allow verbalexpressions to match multiline
+// SearchOneLine deactivate "multiline" mode if true
+// Default is false
 func (v *VerbalExpression) SearchOneLine(oneline bool) *VerbalExpression {
-	v.oneline = oneline
+	v.oneline = !oneline
 	return v
 }
 
@@ -182,12 +183,11 @@ func (v *VerbalExpression) Regex() *regexp.Regexp {
 	if v.oneline {
 		modifier += "m"
 	}
-
 	if len(modifier) > 0 {
-		v.expression = "(?" + modifier + ")" + v.expression
+		modifier = "(?"+modifier+")"
 	}
 
-	return regexp.MustCompile(v.expression)
+	return regexp.MustCompile(modifier + v.expression)
 }
 
 /* proxy and helpers to regexp.Regexp functions */
