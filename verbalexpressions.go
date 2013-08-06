@@ -197,8 +197,12 @@ func (v *VerbalExpression) Word() *VerbalExpression {
 //				Or().
 //				Find("footestbaz")
 func (v *VerbalExpression) Or() *VerbalExpression {
-	v.prefixes += "(?:"
-	v.suffixes = ")" + v.suffixes
+	if strings.Index(v.prefixes, "(") == -1 {
+		v.prefixes += "(?:"
+	}
+	if strings.Index(v.suffixes, ")") == -1 {
+		v.suffixes = ")" + v.suffixes
+	}
 	return v.add(")|(?:")
 }
 
