@@ -69,7 +69,7 @@ func TestOneLine(t *testing.T) {
 	v = New().SearchOneLine(false).Find("a").EndOfLine().Regex()
 	res = v.FindAllStringIndex(s, -1)
 	if len(res) != 3 {
-		t.Errorf("%v should be length 1, %d instead", res, len(res))
+		t.Errorf("%v should be length 3, %d instead", res, len(res))
 	}
 	for _, r := range res {
 		if len(r) != 2 {
