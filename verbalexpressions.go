@@ -184,7 +184,7 @@ func (v *VerbalExpression) Regex() *regexp.Regexp {
 		modifier += "m"
 	}
 	if len(modifier) > 0 {
-		modifier = "(?"+modifier+")"
+		modifier = "(?" + modifier + ")"
 	}
 
 	return regexp.MustCompile(modifier + v.expression)
