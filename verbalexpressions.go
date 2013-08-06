@@ -116,15 +116,20 @@ func (v *VerbalExpression) LineBreak() *VerbalExpression {
 }
 
 // Alias to LineBreak
-func (v *VerbalExpression) BR() *VerbalExpression {
+func (v *VerbalExpression) Br() *VerbalExpression {
 	return v.LineBreak()
 }
 
 // Range accepts an even number of arguments. Each pair of values defines start and end of range.
+// Think like this: Range(from, to [, from, to ...])
 // Example:
 //		s := "This 1 is 55 a TEST"
 //		v := verbalexpressions.New().Range("a","z",0,9)
 func (v *VerbalExpression) Range(args ...interface{}) *VerbalExpression {
+	if len(args)%2 != 0 {
+		log.Panicf("Range: not even args number")
+	}
+
 	parts := make([]string, 3)
 	app := ""
 	for i := 0; i < len(args); i++ {
@@ -136,10 +141,6 @@ func (v *VerbalExpression) Range(args ...interface{}) *VerbalExpression {
 			app += "-"
 		}
 	}
-	if len(args)%2 != 0 {
-		parts = append(parts, tostring(args[len(args)-1]))
-	}
-
 	return v.add("[" + strings.Join(parts, "") + "]")
 }
 
@@ -159,28 +160,18 @@ func (v *VerbalExpression) Or() *VerbalExpression {
 }
 
 // WithAnyCase ask verbalexpressions to match with or without case sensitivity
-func (v *VerbalExpression) WithAnyCase(sensitive ...bool) *VerbalExpression {
-	if len(sensitive) > 1 {
-		panic("WithAnyCase: you should give 0 or 1 argument")
-	}
-	if len(sensitive) == 1 {
-		v.anycase = sensitive[0]
-	}
+func (v *VerbalExpression) WithAnyCase(sensitive bool) *VerbalExpression {
+	v.anycase = sensitive
 	return v
 }
 
 // SearchOneLine allow verbalexpressions to match multiline
-func (v *VerbalExpression) SearchOneLine(oneline ...bool) *VerbalExpression {
-	if len(oneline) > 1 {
-		panic("SearchOneLine: you should give 0 or 1 argument")
-	}
-	if len(oneline) == 1 {
-		v.oneline = oneline[0]
-	}
+func (v *VerbalExpression) SearchOneLine(oneline bool) *VerbalExpression {
+	v.oneline = oneline
 	return v
 }
 
-// Regex return the regular expression to use to test you string.
+// Regex return the regular expression to use to test on string.
 func (v *VerbalExpression) Regex() *regexp.Regexp {
 	modifier := ""
 	if v.anycase {
@@ -198,9 +189,15 @@ func (v *VerbalExpression) Regex() *regexp.Regexp {
 	return regexp.MustCompile(v.expression)
 }
 
-/* proxy to regexp.Regexp functions */
+/* proxy and helpers to regexp.Regexp functions */
 
-// Test return true if you verbalexpressions matches something in "s"
+// Test return true if verbalexpressions matches something in string "s"
 func (v *VerbalExpression) Test(s string) bool {
 	return v.Regex().Match([]byte(s))
+}
+
+// Replace alias to regexp.ReplaceAllString. It replace the found expression from
+// string src by string dst
+func (v *VerbalExpression) Replace(src string, dst string) string {
+	return v.Regex().ReplaceAllString(src, dst)
 }
