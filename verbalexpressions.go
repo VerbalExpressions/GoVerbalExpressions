@@ -13,10 +13,9 @@ import (
 // VerbalExpression structure to create expression
 type VerbalExpression struct {
 	expression string
-	anycase    bool
-	oneline    bool
 	suffixes   string
 	prefixes   string
+	modifiers  string
 }
 
 // quote is an alias to regexp.QuoteMeta
@@ -48,8 +47,22 @@ func tostring(i interface{}) string {
 //		v := verbalexpression.New().Find("foo")
 func New() *VerbalExpression {
 	r := new(VerbalExpression)
-	r.anycase, r.oneline = false, true
+	r.modifiers = "m"
 	return r
+}
+
+// append a modifier
+func (v *VerbalExpression) addmodifier(m string) *VerbalExpression {
+	if !strings.Contains(v.modifiers, m) {
+		v.modifiers += "m"
+	}
+	return v
+}
+
+// remove a modifier
+func (v *VerbalExpression) removemodifier(m string) *VerbalExpression {
+	v.modifiers = strings.Replace(v.modifiers, m, "", -1)
+	return v
 }
 
 // add method, append expresions to the internal string that will be parsed
@@ -171,7 +184,12 @@ func (v *VerbalExpression) Word() *VerbalExpression {
 	return v.add(`\w+`)
 }
 
-// Or, as the word is meaning...
+// Or, chains a alternate expression
+// Example:
+//		v := Verbalexpression.New().
+//				Find("foobarbaz").
+//				Or().
+//				Find("footestbaz")
 func (v *VerbalExpression) Or() *VerbalExpression {
 	v.prefixes += "(?:"
 	v.suffixes = ")" + v.suffixes
@@ -180,29 +198,24 @@ func (v *VerbalExpression) Or() *VerbalExpression {
 
 // WithAnyCase ask verbalexpressions to match with or without case sensitivity
 func (v *VerbalExpression) WithAnyCase(sensitive bool) *VerbalExpression {
-	v.anycase = sensitive
-	return v
+	return v.addmodifier("i")
 }
 
 // SearchOneLine deactivate "multiline" mode if true
 // Default is false
 func (v *VerbalExpression) SearchOneLine(oneline bool) *VerbalExpression {
-	v.oneline = !oneline
-	return v
+	if oneline {
+		return v.removemodifier("m")
+	} else {
+		return v.addmodifier("m")
+	}
 }
 
 // Regex return the regular expression to use to test on string.
 func (v *VerbalExpression) Regex() *regexp.Regexp {
 	modifier := ""
-	if v.anycase {
-		modifier += "i"
-	}
-
-	if v.oneline {
-		modifier += "m"
-	}
-	if len(modifier) > 0 {
-		modifier = "(?" + modifier + ")"
+	if len(v.modifiers) > 0 {
+		modifier = "(?" + v.modifiers + ")"
 	}
 
 	return regexp.MustCompile(modifier + v.prefixes + v.expression + v.suffixes)
