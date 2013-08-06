@@ -116,3 +116,104 @@ func TestReplace(t *testing.T) {
 	}
 
 }
+
+func TestCaptures(t *testing.T) {
+
+	s := "this is a foobarsystem to get bar"
+
+	v := New().Anything().Find("foo").Find("bar").Word()
+	res := v.Regex().FindAllStringSubmatch(s, -1)
+
+	if len(res[0]) > 1 {
+		t.Errorf("%v is not a slice of only one match (globale match)", res)
+	}
+	if res[0][0] != "this is a foobarsystem" {
+		t.Errorf("global capture \"%s\" is not \"this is a foobarsystem\"", res[0][0])
+	}
+
+	v = New().Anything().Find("foo").BeginCapture().Find("bar").Word().EndCapture()
+	res = v.Regex().FindAllStringSubmatch(s, -1)
+
+	if len(res) != 1 {
+		t.Errorf("%v is not slice length 1", res)
+	}
+
+	if res[0][0] != "this is a foobarsystem" {
+		t.Errorf("global capture \"%s\" is not \"this is a foobarsystem\"", res[0][0])
+	}
+	if res[0][1] != "barsystem" {
+		t.Errorf("capture %s is not barsystem", res[0][1])
+	}
+
+}
+
+func TestSeveralCaptures(t *testing.T) {
+
+	s := `
+	this is a foobarsystem that matches my test
+	And there, a new foobartest that should be ok
+`
+
+	v := New().Anything().Find("foo").
+		BeginCapture().
+		Find("bar").Word().
+		EndCapture().
+		SearchOneLine(false)
+	res := v.Regex().FindAllStringSubmatch(s, -1)
+
+	for i, r := range res {
+		switch i {
+		case 0:
+			if r[1] != "barsystem" {
+				t.Errorf("%s is not \"barsystem\"", r[1])
+			}
+		case 1:
+			if r[1] != "bartest" {
+				t.Errorf("%s is not \"bartest\"", r[1])
+			}
+		default:
+			t.Errorf("%v is not allowed result", r)
+		}
+	}
+
+}
+
+func TestCapturingSeveralGroups(t *testing.T) {
+
+	s := `
+
+<b>test 1</b>
+<b>foo 2</b>
+
+`
+	v := New().
+		Find("<b>").
+		BeginCapture().
+		Word().
+		EndCapture().
+		Any(" ").
+		BeginCapture().
+		Range("0", "9").
+		EndCapture().
+		Find("</b>")
+
+	res := v.Captures(s)
+	if len(res) != 2 {
+		t.Errorf("%v is not length 2", res)
+	}
+	for i, r := range res {
+		switch i {
+		case 0:
+			if r[1] != "test" || r[2] != "1" {
+				t.Errorf("%s,%s is not test,1", r[1], r[2])
+			}
+		case 1:
+			if r[1] != "foo" || r[2] != "2" {
+				t.Errorf("%s,%s is not test,1", r[1], r[2])
+			}
+		default:
+			t.Errorf("%d is not a valid result index for %v", i, res)
+		}
+	}
+
+}

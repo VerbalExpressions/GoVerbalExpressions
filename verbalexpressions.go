@@ -15,6 +15,8 @@ type VerbalExpression struct {
 	expression string
 	anycase    bool
 	oneline    bool
+	suffixes   string
+	prefixes   string
 }
 
 // quote is an alias to regexp.QuoteMeta
@@ -56,9 +58,21 @@ func (v *VerbalExpression) add(s string) *VerbalExpression {
 	return v
 }
 
+// Start to capture something, stop with EndCapture()
+func (v *VerbalExpression) BeginCapture() *VerbalExpression {
+	v.suffixes += ")"
+	return v.add("(")
+}
+
+// Stop capturing expresions parts
+func (v *VerbalExpression) EndCapture() *VerbalExpression {
+	v.suffixes = strings.Replace(v.suffixes, ")", "", 1)
+	return v.add(")")
+}
+
 // Anything will match any char
 func (v *VerbalExpression) Anything() *VerbalExpression {
-	return v.add(`(.*)`)
+	return v.add(`(?:.*)`)
 }
 
 // AnythingBut will match anything excpeting the given string.
@@ -67,7 +81,7 @@ func (v *VerbalExpression) Anything() *VerbalExpression {
 //		v := verbalexpressions.New().AnythingBut("ie").RegExp().FindAllString(s, -1)
 //		[Th s  s a s mple t st]
 func (v *VerbalExpression) AnythingBut(s string) *VerbalExpression {
-	return v.add(`([^` + quote(s) + `]*)`)
+	return v.add(`(?:[^` + quote(s) + `]*)`)
 }
 
 // EndOfLine tells verbalexpressions to match a end of line.
@@ -78,7 +92,7 @@ func (v *VerbalExpression) EndOfLine() *VerbalExpression {
 
 // Maybe will search string zero on more times
 func (v *VerbalExpression) Maybe(s string) *VerbalExpression {
-	return v.add(`(` + quote(s) + `)?`)
+	return v.add(`(?:` + quote(s) + `)?`)
 }
 
 // StartOfLine seeks the begining of a line. As EndOfLine you should use
@@ -89,7 +103,7 @@ func (v *VerbalExpression) StartOfLine() *VerbalExpression {
 
 // Find seeks string. The string MUST be there (unlike Maybe() method)
 func (v *VerbalExpression) Find(s string) *VerbalExpression {
-	return v.add(`(` + quote(s) + `)`)
+	return v.add(`(?:` + quote(s) + `)`)
 }
 
 // Alias to Find()
@@ -103,7 +117,7 @@ func (v *VerbalExpression) Then(s string) *VerbalExpression {
 //		v := New().Find("foo").Any("1234567890").Regex().FindAllString(s, -1)
 //		[foo1 foo5]
 func (v *VerbalExpression) Any(s string) *VerbalExpression {
-	return v.add(`([` + quote(s) + `])`)
+	return v.add(`(?:[` + quote(s) + `])`)
 }
 
 //AnyOf is an alias to Any
@@ -113,7 +127,7 @@ func (v *VerbalExpression) AnyOf(s string) *VerbalExpression {
 
 // LineBreak to find "\n" or "\r\n"
 func (v *VerbalExpression) LineBreak() *VerbalExpression {
-	return v.add(`(\n|(\r\n))`)
+	return v.add(`(?:(?:\n)|(?:\r\n))`)
 }
 
 // Alias to LineBreak
@@ -147,12 +161,12 @@ func (v *VerbalExpression) Range(args ...interface{}) *VerbalExpression {
 
 // Tab fetch tabulation char (\t)
 func (v *VerbalExpression) Tab() *VerbalExpression {
-	return v.add(`\t`)
+	return v.add(`\t+`)
 }
 
 // Word matches any word (containing alpha char)
 func (v *VerbalExpression) Word() *VerbalExpression {
-	return v.add(`(\w+)`)
+	return v.add(`\w+`)
 }
 
 // Or, as the word is meaning...
@@ -201,4 +215,27 @@ func (v *VerbalExpression) Test(s string) bool {
 // string src by string dst
 func (v *VerbalExpression) Replace(src string, dst string) string {
 	return v.Regex().ReplaceAllString(src, dst)
+}
+
+// Returns a slice of results from captures. If you didn't apply BeginCapture() and EnCapture(), the slices
+// will return slice of []string where []string is length 1, and 0 index is the global capture
+// Example:
+//		s:="This should get barsystem and whatever..."
+//		// get "bar" followed by a word
+//		v := verbalexpressions.New().Anything().
+//				BeginCatpure().
+//				Find("bar").Word().
+//				EndCapture()
+//
+//		res := v.Captures(s)
+//		fmt.Println(res)
+//		[["This should get barsystem", "barsystem"]]
+//
+// So, to range results, you can do:
+//		for _, captures := range res {
+//			fmt.Println(captures[1])
+//		}
+// Actualy, 1 matches first group, you can use several captures.
+func (v *VerbalExpression) Captures(s string) [][]string {
+	return v.Regex().FindAllStringSubmatch(s, -1)
 }
