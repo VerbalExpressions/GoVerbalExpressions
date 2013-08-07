@@ -40,7 +40,7 @@ import (
 
 func main () {
     v := verbalexpressions.New().
-            StartOfLine()
+            StartOfLine().
             Then("http").
             Maybe("s").
             Then( "://").
