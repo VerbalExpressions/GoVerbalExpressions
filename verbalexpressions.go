@@ -4,6 +4,7 @@
 package verbalexpressions
 
 import (
+	"fmt"
 	"log"
 	"regexp"
 	"strconv"
@@ -187,6 +188,82 @@ func (v *VerbalExpression) Tab() *VerbalExpression {
 // Word matches any word (containing alpha char)
 func (v *VerbalExpression) Word() *VerbalExpression {
 	return v.add(`\w+`)
+}
+
+// Multiply string s expression
+//
+// Multiple(value string [, min int[, max int]])
+//
+// This method accepts 1 to 3 arguments, argument 2 is min, argument 3 is max:
+//
+//		// get "foo" at least one time
+//		v.Multiple("foo")
+//		v.Multiple("foo", 1)
+//
+//		// get "foo" 0 or more times
+//		v.Multiple("foo", 0)
+//
+//		//get "foo" 0 or 1 times
+//		v.Multiple("foo", 0, 1)
+//
+//		// get "foo" 0 to 10 times
+//		v.Multiple("foo",0 ,10)
+//
+//		//get "foo" at least 10 times
+//		v.Multiple("foo", 10)
+//
+//		//get "foo" exactly 10 times
+//		v.Multiple("foo", 10, 10)
+//
+//		//get "foo" from 1 to 10 times
+//		v.Multiple("foo", 1, 10)
+func (v *VerbalExpression) Multiple(s string, mults ...int) *VerbalExpression {
+
+	if len(mults) > 2 {
+		panic("Multiple: you can only give 1 or to multipliers, min and max as int")
+	}
+	// fetch multiplier if any
+	var min, max int = -1, -1
+	mult := "+"
+
+	if len(mults) > 0 {
+		min = mults[0]
+		if len(mults) == 2 {
+			max = mults[1]
+		}
+	}
+
+	if min == 0 && max == 1 {
+		// 0 or 1 time
+		mult = "?"
+	}
+
+	if min == 0 && max == -1 {
+		// 0 or more
+		mult = "*"
+	}
+
+	if min == 1 && max == -1 {
+		// at least 1 time
+		mult = "+"
+	}
+
+	if min > 1 && max == -1 {
+		//at least min times
+		mult = fmt.Sprintf("{%d,}", min)
+	}
+
+	if max > 1 {
+		if min > 0 {
+			// min to max times
+			mult = fmt.Sprintf("{%d,%d}", min, max)
+		} else {
+			// max times
+			mult = fmt.Sprintf("{,%d}", max)
+		}
+	}
+
+	return v.add("(?:" + quote(s) + ")" + mult)
 }
 
 // Or, chains a alternate expression

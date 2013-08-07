@@ -241,3 +241,35 @@ func TestORMethod(t *testing.T) {
 	}
 
 }
+
+func TestMultipleMethod(t *testing.T) {
+	assertStringEquals := func(s1, s2 string) {
+
+		if s1 != s2 {
+			t.Errorf("%s != %s", s1, s2)
+		}
+
+	}
+
+	v := New().Multiple("foo")
+	assertStringEquals(v.Regex().String(), "(?m)(?:foo)+")
+
+	v = New().Multiple("foo", 0)
+	assertStringEquals(v.Regex().String(), "(?m)(?:foo)*")
+
+	v = New().Multiple("foo", 0, 1)
+	assertStringEquals(v.Regex().String(), "(?m)(?:foo)?")
+
+	v = New().Multiple("foo", 0, 10)
+	assertStringEquals(v.Regex().String(), "(?m)(?:foo){,10}")
+
+	v = New().Multiple("foo", 10)
+	assertStringEquals(v.Regex().String(), "(?m)(?:foo){10,}")
+
+	v = New().Multiple("foo", 10, 10)
+	assertStringEquals(v.Regex().String(), "(?m)(?:foo){10,10}")
+
+	v = New().Multiple("foo", 1, 10)
+	assertStringEquals(v.Regex().String(), "(?m)(?:foo){1,10}")
+
+}
