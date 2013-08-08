@@ -99,6 +99,16 @@ func (v *VerbalExpression) AnythingBut(s string) *VerbalExpression {
 	return v.add(`(?:[^` + quote(s) + `]*)`)
 }
 
+// Something matches at least one char
+func (v *VerbalExpression) Something() *VerbalExpression {
+	return v.add(`(?:.+)`)
+}
+
+// Same as Something but excepting chars given in string "s"
+func (v *VerbalExpression) SomethingBut(s string) *VerbalExpression {
+	return v.add(`(?:[^` + quote(s) + `]+)`)
+}
+
 // EndOfLine tells verbalexpressions to match a end of line.
 // Warning, to check multiple line, you must use SearchOneLine(true)
 func (v *VerbalExpression) EndOfLine() *VerbalExpression {
@@ -348,3 +358,31 @@ func (v *VerbalExpression) Replace(src string, dst string) string {
 func (v *VerbalExpression) Captures(s string) [][]string {
 	return v.Regex().FindAllStringSubmatch(s, -1)
 }
+
+/*
+v	add
+v	startOfLine
+v	endOfLine
+v	then
+v	find
+v	maybe
+v	anything
+v	anythingBut
+v	something
+v	somethingBut
+v	replace
+v	lineBreak
+v	br (shorthand for lineBreak)
+v	tab
+v	word
+v	anyOf
+v	any (shorthand for anyOf)
+v	range
+v	withAnyCase
+	stopAtFirst
+v	searchOneLine
+v	multiple
+v	or
+v	begindCapture
+v	endCapture
+*/
