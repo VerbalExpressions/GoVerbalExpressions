@@ -60,3 +60,31 @@ func main () {
 ```
 
 
+We try to give alias method and/or helpers. For example:
+
+```go
+
+    // s will be "We have a blue house"
+    s := verbalexpressions.New().Find("red").Replace("We have a red house", "blue")
+
+    // c will be:
+    // [
+    //    ["http://www.google.com",  "http://", "www.google.com"]
+    // ]
+    c := verbalexpressions.New().
+        BeginCapture().
+        Find("http").
+        Maybe("s").
+        Find("://").
+        EndCapture().
+        BeginCapture().
+        Find("www.").Anything().
+        EndCapture().
+        Captures("http://www.google.com")
+
+    // check c[0][1] => http://
+    //       c[0][2] => www.google.com
+
+```
+
+
