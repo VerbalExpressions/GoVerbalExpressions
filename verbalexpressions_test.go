@@ -78,7 +78,7 @@ func TestOneLine(t *testing.T) {
 	}
 }
 
-func TestExcepting(t *testing.T) {
+func TestAnythingBut(t *testing.T) {
 
 	s := "This is a simple test"
 	v := New().AnythingBut("im").Regex().FindAllString(s, -1)
