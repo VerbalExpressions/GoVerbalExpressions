@@ -178,6 +178,32 @@ func TestSeveralCaptures(t *testing.T) {
 
 }
 
+func TestCaptureSeveralTimes(t *testing.T) {
+	v := New().
+		BeginCapture().
+		Find("http").
+		Maybe("s").
+		Find("://").
+		EndCapture().
+		BeginCapture().
+		Find("www.").Anything().
+		EndCapture()
+	c := v.Captures("http://www.google.com")
+
+	if len(c) != 1 {
+		t.Errorf("capture length is not 1: %d", len(c))
+	}
+
+	if c[0][1] != "http://" {
+		t.Errorf("first group should be http://, found: %s", c[0][1])
+	}
+
+	if c[0][2] != "www.google.com" {
+		t.Errorf("first group should be www.google.com, found: %s", c[0][2])
+	}
+
+}
+
 func TestCapturingSeveralGroups(t *testing.T) {
 
 	s := `
