@@ -99,10 +99,12 @@ func (v *VerbalExpression) AnythingBut(s string) *VerbalExpression {
 	return v.add(`(?:[^` + quote(s) + `]*)`)
 }
 
+// Something matches at least one char
 func (v *VerbalExpression) Something() *VerbalExpression {
 	return v.add(`(?:.+)`)
 }
 
+// Same as Something but excepting chars given in string "s"
 func (v *VerbalExpression) SomethingBut(s string) *VerbalExpression {
 	return v.add(`(?:[^` + quote(s) + `]+)`)
 }
