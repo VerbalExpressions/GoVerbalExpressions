@@ -181,12 +181,12 @@ func TestSeveralCaptures(t *testing.T) {
 func TestCaptureSeveralTimes(t *testing.T) {
 	v := New().
 		BeginCapture().
-		Find("http").
-		Maybe("s").
+		Find("http"). // find http
+		Maybe("s").   // + s if any
 		Find("://").
-		EndCapture().
+		EndCapture(). // stop, so we will capture http:// and https://
 		BeginCapture().
-		Find("www.").Anything().
+		Find("www.").Anything(). // capture url: www.google.com
 		EndCapture()
 	c := v.Captures("http://www.google.com")
 

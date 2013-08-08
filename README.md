@@ -71,7 +71,7 @@ We try to give alias method and/or helpers. For example:
     // [
     //    ["http://www.google.com",  "http://", "www.google.com"]
     // ]
-    c := verbalexpressions.
+    c := verbalexpressions.New().
         BeginCapture().
         Find("http").
         Maybe("s").
