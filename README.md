@@ -73,12 +73,10 @@ We try to give alias method and/or helpers. For example:
     // ]
     c := verbalexpressions.New().
         BeginCapture().
-        Find("http").
-        Maybe("s").
-        Find("://").
+            Find("http").Maybe("s").Find("://").
         EndCapture().
         BeginCapture().
-        Find("www.").Anything().
+            Find("www.").Anything().
         EndCapture().
         Captures("http://www.google.com")
 
