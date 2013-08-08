@@ -273,3 +273,22 @@ func TestMultipleMethod(t *testing.T) {
 	assertStringEquals(v.Regex().String(), "(?m)(?:foo){1,10}")
 
 }
+
+func TestSomethingMethods(t *testing.T) {
+
+	s := "abcdefghi"
+
+	v := New().Find("ab").Something().Find("ef")
+	res := v.Regex().FindAllString(s, -1)
+
+	if res[0] != "abcdef" {
+		t.Errorf("%v hasn't %s ", res, "abcdef")
+	}
+
+	v = New().Find("ab").SomethingBut("d")
+	res = v.Regex().FindAllString(s, -1)
+	if res[0] != "abc" {
+		t.Errorf("%v hasn't %s ", res, "abc")
+	}
+
+}
