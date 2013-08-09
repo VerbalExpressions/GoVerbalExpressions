@@ -341,11 +341,11 @@ func (v *VerbalExpression) Regex() *regexp.Regexp {
 
 	if !v.compiled {
 		v.regexp = regexp.MustCompile(
-		strings.Join([]string{
-			`(?` + v.getFlags() + `)`,
-			v.prefixes,
-			v.expression,
-			v.suffixes}, ""))
+			strings.Join([]string{
+				`(?` + v.getFlags() + `)`,
+				v.prefixes,
+				v.expression,
+				v.suffixes}, ""))
 		v.compiled = true
 	}
 	return v.regexp
