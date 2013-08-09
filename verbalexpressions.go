@@ -11,12 +11,23 @@ import (
 	"strings"
 )
 
+type Flag uint
+
+const (
+	MULTILINE   Flag = 1 << iota
+	IGNORE_CASE Flag = 1 << iota
+	DOTALL      Flag = 1 << iota
+	UNGREEDY    Flag = 1 << iota
+)
+
 // VerbalExpression structure to create expression
 type VerbalExpression struct {
 	expression string
 	suffixes   string
 	prefixes   string
-	modifiers  string
+	flags      Flag
+	compiled   bool
+	regexp     *regexp.Regexp
 }
 
 // quote is an alias to regexp.QuoteMeta
@@ -49,26 +60,41 @@ func tostring(i interface{}) string {
 //		v := verbalexpression.New().Find("foo")
 func New() *VerbalExpression {
 	r := new(VerbalExpression)
-	r.modifiers = "m"
+	r.flags = MULTILINE
 	return r
 }
 
 // append a modifier
-func (v *VerbalExpression) addmodifier(m string) *VerbalExpression {
-	if !strings.Contains(v.modifiers, m) {
-		v.modifiers += "m"
-	}
+func (v *VerbalExpression) addmodifier(f Flag) *VerbalExpression {
+	v.compiled = false //reinit previous regexp compilation
+	v.flags |= f
 	return v
 }
 
 // remove a modifier
-func (v *VerbalExpression) removemodifier(m string) *VerbalExpression {
-	v.modifiers = strings.Replace(v.modifiers, m, "", -1)
+func (v *VerbalExpression) removemodifier(f Flag) *VerbalExpression {
+	v.compiled = false //reinit previous regexp compilation
+	v.flags &= ^f
 	return v
+}
+
+// append modifiers that are activated
+func (v *VerbalExpression) getFlags() string {
+	flags := "misU" // warning, follow Flag const order
+	result := []rune{}
+
+	for i, flag := range flags {
+		if v.flags&(1<<uint(i)) != 0 {
+			result = append(result, flag)
+		}
+	}
+
+	return string(result)
 }
 
 // add method, append expresions to the internal string that will be parsed
 func (v *VerbalExpression) add(s string) *VerbalExpression {
+	v.compiled = false //reinit previous regexp compilation
 	v.expression += s
 	return v
 }
@@ -295,29 +321,35 @@ func (v *VerbalExpression) Or() *VerbalExpression {
 
 // WithAnyCase asks verbalexpressions to match with or without case sensitivity
 func (v *VerbalExpression) WithAnyCase(sensitive bool) *VerbalExpression {
-	if !sensitive {
-		return v.removemodifier("i")
+	if sensitive {
+		return v.addmodifier(IGNORE_CASE)
 	}
-	return v.addmodifier("i")
+	return v.removemodifier(IGNORE_CASE)
 }
 
 // SearchOneLine deactivates "multiline" mode if online argument is true
 // Default is false
 func (v *VerbalExpression) SearchOneLine(oneline bool) *VerbalExpression {
-	if oneline {
-		return v.removemodifier("m")
+	if !oneline {
+		return v.addmodifier(MULTILINE)
 	}
-	return v.addmodifier("m")
+	return v.removemodifier(MULTILINE)
 }
 
 // Regex returns the regular expression to use to test on string.
 func (v *VerbalExpression) Regex() *regexp.Regexp {
-	modifier := ""
-	if len(v.modifiers) > 0 {
-		modifier = "(?" + v.modifiers + ")"
-	}
 
-	return regexp.MustCompile(modifier + v.prefixes + v.expression + v.suffixes)
+	if !v.compiled {
+		v.regexp = regexp.MustCompile(
+		strings.Join([]string{
+			`(?` + v.getFlags() + `)`,
+			v.prefixes,
+			v.expression,
+			v.suffixes}, ""))
+		v.compiled = true
+	}
+	return v.regexp
+
 }
 
 /* proxy and helpers to regexp.Regexp functions */
