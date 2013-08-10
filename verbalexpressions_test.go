@@ -331,7 +331,7 @@ baz
 		t.Errorf("Error, %s should not match bar.baz", v.Regex())
 	}
 
-	v.MatchAllWithDot()
+	v.MatchAllWithDot(true)
 	res = v.Test(s)
 	if !res {
 		t.Errorf("Error, %s should match bar.baz", v.Regex())
