@@ -341,8 +341,11 @@ func (v *VerbalExpression) SearchOneLine(oneline bool) *VerbalExpression {
 }
 
 // MatchAllWithDot lets VerbalExpression matching "." for everything including \n, \r, and so on
-func (v *VerbalExpression) MatchAllWithDot() *VerbalExpression {
-	return v.addmodifier(DOTALL)
+func (v *VerbalExpression) MatchAllWithDot(enable bool) *VerbalExpression {
+	if enable {
+		return v.addmodifier(DOTALL)
+	}
+	return v.removemodifier(DOTALL)
 }
 
 // Regex returns the regular expression to use to test on string.
