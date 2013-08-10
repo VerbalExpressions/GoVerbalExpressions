@@ -6,6 +6,12 @@ package verbalexpressions
 import "testing"
 import "strings"
 
+func assertStringEquals(s1, s2 string, t *testing.T) {
+	if s1 != s2 {
+		t.Errorf("%s != %s", s1, s2)
+	}
+}
+
 func TestChaining(t *testing.T) {
 
 	exp := "http://www.google.com"
@@ -269,34 +275,26 @@ func TestORMethod(t *testing.T) {
 }
 
 func TestMultipleMethod(t *testing.T) {
-	assertStringEquals := func(s1, s2 string) {
-
-		if s1 != s2 {
-			t.Errorf("%s != %s", s1, s2)
-		}
-
-	}
-
 	v := New().Multiple("foo")
-	assertStringEquals(v.Regex().String(), "(?m)(?:foo)+")
+	assertStringEquals(v.Regex().String(), "(?m)(?:foo)+", t)
 
 	v = New().Multiple("foo", 0)
-	assertStringEquals(v.Regex().String(), "(?m)(?:foo)*")
+	assertStringEquals(v.Regex().String(), "(?m)(?:foo)*", t)
 
 	v = New().Multiple("foo", 0, 1)
-	assertStringEquals(v.Regex().String(), "(?m)(?:foo)?")
+	assertStringEquals(v.Regex().String(), "(?m)(?:foo)?", t)
 
 	v = New().Multiple("foo", 0, 10)
-	assertStringEquals(v.Regex().String(), "(?m)(?:foo){,10}")
+	assertStringEquals(v.Regex().String(), "(?m)(?:foo){,10}", t)
 
 	v = New().Multiple("foo", 10)
-	assertStringEquals(v.Regex().String(), "(?m)(?:foo){10,}")
+	assertStringEquals(v.Regex().String(), "(?m)(?:foo){10,}", t)
 
 	v = New().Multiple("foo", 10, 10)
-	assertStringEquals(v.Regex().String(), "(?m)(?:foo){10,10}")
+	assertStringEquals(v.Regex().String(), "(?m)(?:foo){10,10}", t)
 
 	v = New().Multiple("foo", 1, 10)
-	assertStringEquals(v.Regex().String(), "(?m)(?:foo){1,10}")
+	assertStringEquals(v.Regex().String(), "(?m)(?:foo){1,10}", t)
 
 }
 
@@ -337,4 +335,40 @@ baz
 		t.Errorf("Error, %s should match bar.baz", v.Regex())
 	}
 
+}
+
+func TestWithAnyCase(t *testing.T) {
+	s := "A MESSAGE IN CAPS"
+
+	v := New().Find("message").WithAnyCase(true)
+	res := v.Test(s)
+	if !res {
+		t.Errorf("Error, message should match MESSAGE", v.Regex())
+	}
+}
+
+func TestModifiers(t *testing.T) {
+	v := New()
+	assertStringEquals(v.getFlags(), "m", t)
+
+	v.SearchOneLine(true)
+	assertStringEquals(v.getFlags(), "", t)
+
+	v.SearchOneLine(false)
+	assertStringEquals(v.getFlags(), "m", t)
+
+	v.WithAnyCase(true)
+	assertStringEquals(v.getFlags(), "mi", t)
+
+	v.WithAnyCase(false)
+	assertStringEquals(v.getFlags(), "m", t)
+
+	v.MatchAllWithDot(true)
+	assertStringEquals(v.getFlags(), "ms", t)
+
+	v.MatchAllWithDot(false)
+	assertStringEquals(v.getFlags(), "m", t)
+
+	v.flags = 16
+	assertStringEquals(v.getFlags(), "", t)
 }
