@@ -318,3 +318,23 @@ func TestSomethingMethods(t *testing.T) {
 	}
 
 }
+
+func TestAllWithDot(t *testing.T) {
+
+	s := `
+foo bar
+baz
+`
+	v := New().Find("bar").Anything().Then("baz")
+	res := v.Test(s)
+	if res {
+		t.Errorf("Error, %s should not match bar.baz", v.Regex())
+	}
+
+	v.MatchAllWithDot()
+	res = v.Test(s)
+	if !res {
+		t.Errorf("Error, %s should match bar.baz", v.Regex())
+	}
+
+}
