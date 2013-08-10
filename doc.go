@@ -3,14 +3,11 @@ This is a Go implementation of VerbalExpressions for other languages. Check http
 
 VerbalExperssions is a way to build complex regular expressions with a verbal language.
 
-Important: Because the package is hosted on github organization, the name used to host repository is a bit complicated.
-That's why we named package "verbalexpressions" instead of "GoVerbalExpressions". So, to import package you *MUST* do:
+The repo name is "GoVerbalExpressions" but the real package name is "verbalexpressions". So, to import verbalexpressions package, just do:
 
-	import verbalexpressions "github.com/VerbalExpressions/GoVerbalExpressions"
+	import "github.com/VerbalExpressions/GoVerbalExpressions"
 
-This is very important !
-
-Using verbalexpressions:
+Then, use "verbalexpressions" as prefix. There is a simple example
 
 Use "New()" factory then you can chain calls. Go syntax allows you to set new line after seperators:
 
@@ -25,6 +22,11 @@ Then, you can use "Test()" method to check if your string matches expression.
 
 You may get the regexp.Regexp structure using "Regex()" method, then use common methods to split, replace, find submatches and so on... as usual
 
+There are some helpers that use direct call to the regexp package:
+
+- Replace
+- Captures
+- Test
 
 */
 package verbalexpressions
