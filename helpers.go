@@ -36,5 +36,9 @@ func (v *VerbalExpression) Replace(src string, dst string) string {
 //		}
 // Actualy, 1 matches first group, you can use several captures.
 func (v *VerbalExpression) Captures(s string) [][]string {
-	return v.Regex().FindAllStringSubmatch(s, -1)
+	iter := 1
+	if v.flags&GLOBAL != 0 {
+		iter = -1
+	}
+	return v.Regex().FindAllStringSubmatch(s, iter)
 }
