@@ -18,6 +18,7 @@ const (
 	IGNORE_CASE Flag = 1 << iota
 	DOTALL      Flag = 1 << iota
 	UNGREEDY    Flag = 1 << iota
+	GLOBAL      Flag = 1 << iota
 )
 
 // VerbalExpression structure to create expression
@@ -60,7 +61,7 @@ func tostring(i interface{}) string {
 //		v := verbalexpression.New().Find("foo")
 func New() *VerbalExpression {
 	r := new(VerbalExpression)
-	r.flags = MULTILINE
+	r.flags = MULTILINE | GLOBAL
 	return r
 }
 
@@ -361,7 +362,14 @@ func (v *VerbalExpression) Regex() *regexp.Regexp {
 		v.compiled = true
 	}
 	return v.regexp
+}
 
+func (v *VerbalExpression) StopAtFirst(enable bool) *VerbalExpression {
+	if enable {
+		return v.removemodifier(GLOBAL)
+	}
+
+	return v.addmodifier(GLOBAL)
 }
 
 /*
@@ -386,7 +394,7 @@ v	anyOf
 v	any (shorthand for anyOf)
 v	range
 v	withAnyCase
-	stopAtFirst
+v	stopAtFirst
 v	searchOneLine
 v	multiple
 v	or

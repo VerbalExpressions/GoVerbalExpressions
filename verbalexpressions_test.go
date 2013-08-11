@@ -372,3 +372,29 @@ func TestModifiers(t *testing.T) {
 	v.flags = 16
 	assertStringEquals(v.getFlags(), "", t)
 }
+
+func TestGlobalModifier(t *testing.T) {
+
+	s := "aaa aab aba abc"
+
+	v := New().BeginCapture().Find("aa").AnythingBut(" ").EndCapture()
+
+	res := v.Captures(s)
+
+	if len(res) != 2 {
+		t.Errorf("Initial state, GLOBAL on: %v is not lenght 2", res)
+	}
+
+	v.StopAtFirst(true)
+	res = v.Captures(s)
+	if len(res) > 1 {
+		t.Errorf("%v is not lenght 1", res)
+	}
+
+	v.StopAtFirst(false)
+	res = v.Captures(s)
+	if len(res) != 2 {
+		t.Errorf("State 2, GLOBAL reactivated: %v is not lenght 2", res)
+	}
+
+}
