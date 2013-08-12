@@ -275,7 +275,12 @@ func TestORMethod(t *testing.T) {
 }
 
 func TestMultipleMethod(t *testing.T) {
+
 	v := New().Multiple("foo")
+	assertStringEquals(v.Regex().String(), "(?m)(?:foo)+", t)
+
+	// it the same... but to cover...
+	v = New().Multiple("foo", 1)
 	assertStringEquals(v.Regex().String(), "(?m)(?:foo)+", t)
 
 	v = New().Multiple("foo", 0)
@@ -296,6 +301,15 @@ func TestMultipleMethod(t *testing.T) {
 	v = New().Multiple("foo", 1, 10)
 	assertStringEquals(v.Regex().String(), "(?m)(?:foo){1,10}", t)
 
+}
+
+func TestPanicMultipleMethod(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("We should have panic here !")
+		}
+	}()
+	_ = New().Multiple("foo", 1, 10, 15)
 }
 
 func TestSomethingMethods(t *testing.T) {
