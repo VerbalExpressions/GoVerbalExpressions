@@ -275,7 +275,12 @@ func TestORMethod(t *testing.T) {
 }
 
 func TestMultipleMethod(t *testing.T) {
+
 	v := New().Multiple("foo")
+	assertStringEquals(v.Regex().String(), "(?m)(?:foo)+", t)
+
+	// it the same... but to cover...
+	v = New().Multiple("foo", 1)
 	assertStringEquals(v.Regex().String(), "(?m)(?:foo)+", t)
 
 	v = New().Multiple("foo", 0)
@@ -296,6 +301,15 @@ func TestMultipleMethod(t *testing.T) {
 	v = New().Multiple("foo", 1, 10)
 	assertStringEquals(v.Regex().String(), "(?m)(?:foo){1,10}", t)
 
+}
+
+func TestPanicMultipleMethod(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("We should have panic here !")
+		}
+	}()
+	_ = New().Multiple("foo", 1, 10, 15)
 }
 
 func TestSomethingMethods(t *testing.T) {
@@ -397,4 +411,46 @@ func TestGlobalModifier(t *testing.T) {
 		t.Errorf("State 2, GLOBAL reactivated: %v is not lenght 2", res)
 	}
 
+}
+
+func TestStartEndWithOR(t *testing.T) {
+	s := `
+foo
+no
+bar
+bar foo bar
+ok
+not
+test
+foo bar foo
+bar
+`
+	// This is a very hight problem
+	// This should generate (?m)^(?:foo)$|^(?:bar)$
+	v := New().
+		StartOfLine().
+		Find("foo").
+		EndOfLine().
+		Or().
+		StartOfLine().
+		Find("bar").
+		EndOfLine()
+
+	res := v.Regex().FindAllStringSubmatch(s, -1)
+	if len(res) != 3 {
+		t.Errorf("%v is not length 3", res)
+	}
+
+	// another possibility
+	v = New().
+		StartOfLine().
+		Find("foo").
+		EndOfLine().
+		Or().
+		Find("bar")
+
+	res = v.Regex().FindAllStringSubmatch(s, -1)
+	if len(res) != 6 {
+		t.Errorf("%v is not length 6", res)
+	}
 }
