@@ -43,12 +43,14 @@ func tostring(i interface{}) string {
 	switch x := i.(type) {
 	case string:
 		r = x
+	case uint64:
+		r = strconv.FormatUint(x, 10)
 	case int64:
-		r = strconv.FormatInt(x, 64)
+		r = strconv.FormatInt(x, 10)
 	case uint:
-		r = strconv.FormatUint(uint64(x), 64)
+		r = strconv.FormatUint(uint64(x), 10)
 	case int:
-		r = strconv.FormatInt(int64(x), 32)
+		r = strconv.FormatInt(int64(x), 10)
 	default:
 		log.Panicf("Could not convert %v %t", x, x)
 	}

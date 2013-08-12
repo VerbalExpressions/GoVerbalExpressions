@@ -106,6 +106,12 @@ func TestAny(t *testing.T) {
 	if len(res) != 2 {
 		t.Errorf("len(res) : %d isn't 2", len(res))
 	}
+	//test alias
+	v = New().Find("foo").AnyOf("1234567890")
+	res = v.Regex().FindAllString(s, -1)
+	if len(res) != 2 {
+		t.Errorf("len(res) : %d isn't 2", len(res))
+	}
 
 }
 
@@ -453,4 +459,62 @@ bar
 	if len(res) != 6 {
 		t.Errorf("%v is not length 6", res)
 	}
+}
+
+func TestLineBreak(t *testing.T) {
+	s := `
+foo
+bar
+baz
+`
+	v := New().Find("foo").LineBreak().Find("bar")
+	if !v.Test(s) {
+		t.Errorf("%v should match %s", v.Regex(), s)
+	}
+
+	v = New().Find("foo").Br().Find("bar")
+	if !v.Test(s) {
+		t.Errorf("%v should match %s", v.Regex(), s)
+	}
+}
+
+func TestTABMethod(t *testing.T) {
+	s := "foo	bar baz"
+	v := New().Find("foo").Tab().Find("bar")
+	r := v.Test(s)
+	if !r {
+		t.Errorf("%v should match %s", v.Regex(), s)
+	}
+}
+
+func TestToString(t *testing.T) {
+
+	res := tostring(int64(15))
+	if res != "15" {
+		t.Errorf("%v is not string \"15\"", res)
+	}
+
+	res = tostring(uint64(15))
+	if res != "15" {
+		t.Errorf("%v is not string \"15\"", res)
+	}
+
+	res = tostring(uint(15))
+	if res != "15" {
+		t.Errorf("%v is not string \"15\"", res)
+	}
+
+}
+
+func TestToStringMustPanic(t *testing.T) {
+
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("ToString must panic with unsupported types")
+		}
+	}()
+
+	s := make(chan int)
+	_ = tostring(s)
+
 }
