@@ -398,3 +398,45 @@ func TestGlobalModifier(t *testing.T) {
 	}
 
 }
+
+func TestStartEndWithOR(t *testing.T) {
+	s := `
+foo
+no
+bar
+bar foo bar
+ok
+not
+test
+foo bar foo
+bar
+`
+	// This is a very hight problem
+	// This should generate (?m)^(?:foo)$|^(?:bar)$
+	v := New().
+		StartOfLine().
+		Find("foo").
+		EndOfLine().
+		Or().
+		StartOfLine().
+		Find("bar").
+		EndOfLine()
+
+	res := v.Regex().FindAllStringSubmatch(s, -1)
+	if len(res) != 3 {
+		t.Errorf("%v is not length 3", res)
+	}
+
+	// another possibility
+	v = New().
+		StartOfLine().
+		Find("foo").
+		EndOfLine().
+		Or().
+		Find("bar")
+
+	res = v.Regex().FindAllStringSubmatch(s, -1)
+	if len(res) != 6 {
+		t.Errorf("%v is not length 6", res)
+	}
+}

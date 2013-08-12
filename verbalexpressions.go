@@ -24,6 +24,7 @@ const (
 // VerbalExpression structure to create expression
 type VerbalExpression struct {
 	expression string
+	parts      []string
 	suffixes   string
 	prefixes   string
 	flags      Flag
@@ -62,6 +63,7 @@ func tostring(i interface{}) string {
 func New() *VerbalExpression {
 	r := new(VerbalExpression)
 	r.flags = MULTILINE | GLOBAL
+	r.parts = make([]string, 1)
 	return r
 }
 
@@ -139,7 +141,7 @@ func (v *VerbalExpression) SomethingBut(s string) *VerbalExpression {
 // EndOfLine tells verbalexpressions to match a end of line.
 // Warning, to check multiple line, you must use SearchOneLine(true)
 func (v *VerbalExpression) EndOfLine() *VerbalExpression {
-	if !strings.HasSuffix(v.prefixes, "$") {
+	if !strings.HasSuffix(v.suffixes, "$") {
 		v.suffixes += "$"
 	}
 	return v
@@ -154,7 +156,7 @@ func (v *VerbalExpression) Maybe(s string) *VerbalExpression {
 // SearchOneLine(true) to test multiple lines
 func (v *VerbalExpression) StartOfLine() *VerbalExpression {
 	if !strings.HasPrefix(v.prefixes, "^") {
-		v.prefixes += `^`
+		v.prefixes = `^` + v.prefixes
 	}
 	return v
 }
@@ -321,7 +323,13 @@ func (v *VerbalExpression) Or() *VerbalExpression {
 	if strings.Index(v.suffixes, ")") == -1 {
 		v.suffixes = ")" + v.suffixes
 	}
-	return v.add(")|(?:")
+
+	v.parts = append(v.parts, strings.Join([]string{v.prefixes, v.expression, v.suffixes}, "")+"|")
+	v.expression = ""
+	v.prefixes = ""
+	v.suffixes = ""
+	v.compiled = false
+	return v
 }
 
 // WithAnyCase asks verbalexpressions to match with or without case sensitivity
@@ -356,6 +364,7 @@ func (v *VerbalExpression) Regex() *regexp.Regexp {
 		v.regexp = regexp.MustCompile(
 			strings.Join([]string{
 				`(?` + v.getFlags() + `)`,
+				strings.Join(v.parts, ""),
 				v.prefixes,
 				v.expression,
 				v.suffixes}, ""))
