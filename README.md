@@ -1,7 +1,7 @@
 GoVerbalExpressions
 ===================
 
-[![Build Status](https://travis-ci.org/VerbalExpressions/GoVerbalExpressions.png?branch=master)](https://travis-ci.org/VerbalExpressions/GoVerbalExpressions)
+[![Build Status](https://drone.io/github.com/VerbalExpressions/GoVerbalExpressions/status.png)](https://drone.io/github.com/VerbalExpressions/GoVerbalExpressions/latest)
 [![Coverage Status](https://coveralls.io/repos/VerbalExpressions/GoVerbalExpressions/badge.png?branch=master)](https://coveralls.io/r/VerbalExpressions/GoVerbalExpressions?branch=master)
 
 Go VerbalExpressions implementation
