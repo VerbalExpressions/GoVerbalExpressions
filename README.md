@@ -1,6 +1,8 @@
 GoVerbalExpressions
 ===================
 
+[![Build Status](https://travis-ci.org/VerbalExpressions/GoVerbalExpressions.png?branch=master)](https://travis-ci.org/VerbalExpressions/GoVerbalExpressions)
+
 Go VerbalExpressions implementation
 
 VerbalExpression is a concept to help building difficult regular expressions.
