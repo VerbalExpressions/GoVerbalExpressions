@@ -37,7 +37,7 @@ This will install package in your $GOPATH and you will be ready to import it.
 
 // import with a nice name
 import (
-    verbalexpressions "github.com/VerbalExpressions/GoVerbalExpressions"
+    "github.com/VerbalExpressions/GoVerbalExpressions" // imports verbalexpressions package
     "fmt"
 )
 
