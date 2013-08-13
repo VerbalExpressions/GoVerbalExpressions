@@ -12,7 +12,7 @@ See online doc here: http://godoc.org/github.com/VerbalExpressions/GoVerbalExpre
 
 
 ## Other Implementations
-You can see an up to date list of all ports in our [organization](https://github.com/VerbalExpressions).
+You can see an up to date list of all ports on [VerbalExpressions.github.io](http://VerbalExpressions.github.io).
 - [Javascript](https://github.com/jehna/VerbalExpressions)
 - [Ruby](https://github.com/VerbalExpressions/RubyVerbalExpressions)
 - [C#](https://github.com/VerbalExpressions/CSharpVerbalExpressions)
