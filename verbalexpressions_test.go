@@ -255,7 +255,7 @@ func TestCapturingSeveralGroups(t *testing.T) {
 	}
 
 }
-
+/*
 func TestORMethod(t *testing.T) {
 
 	s := "foobarbaz footestbaz foonobaz"
@@ -279,7 +279,7 @@ func TestORMethod(t *testing.T) {
 	}
 
 }
-
+*/
 func TestMultipleMethod(t *testing.T) {
 
 	v := New().Multiple("foo")
@@ -437,11 +437,12 @@ bar
 		StartOfLine().
 		Find("foo").
 		EndOfLine().
-		Or().
+		Or(New().
 		StartOfLine().
 		Find("bar").
-		EndOfLine()
+		EndOfLine())
 
+	t.Log(v.Regex())
 	res := v.Regex().FindAllStringSubmatch(s, -1)
 	if len(res) != 3 {
 		t.Errorf("%v is not length 3", res)
@@ -452,8 +453,7 @@ bar
 		StartOfLine().
 		Find("foo").
 		EndOfLine().
-		Or().
-		Find("bar")
+		Or(New().Find("bar"))
 
 	res = v.Regex().FindAllStringSubmatch(s, -1)
 	if len(res) != 6 {
@@ -516,5 +516,66 @@ func TestToStringMustPanic(t *testing.T) {
 
 	s := make(chan int)
 	_ = tostring(s)
+
+}
+
+
+/*func TestNotMethod(t *testing.T) {
+
+	s:=`
+foobarbaz
+footestbaz
+fooexceptingbaz
+foootherokbaz
+`
+
+	v := New().
+		Find("foo").
+		BeginCapture().
+		Not("excepting").
+		EndCapture().
+		Find("baz")
+	res := v.Captures(s)
+	t.Log(res)
+	t.Log(v.Regex())
+
+}*/
+
+
+func TestAndOrCumulate(t *testing.T) {
+
+	s:=`AB
+BC
+AC
+BB
+CC
+A
+B
+B
+C
+A
+C
+C
+C`
+
+
+	v1 := New().Find("B")
+	t.Log(v1.Regex())
+	v2 := New().Find("c").WithAnyCase(true).Or(v1) // Find B or C
+	v:= New().Find("A").And(v2) // Find A and (B or C)
+
+	t.Log(v.Regex())
+	res := v.Regex().FindAllStringSubmatch(s, -1)
+
+	if len(res) != 2 {
+		t.Errorf("%v is not length 2", res)
+	}
+
+	if res[0][0] != "AB" {
+		t.Errorf("%v is not AB ", res[0][0])
+	}
+	if res[1][0] != "AC" {
+		t.Errorf("%v is not AC ", res[1][0])
+	}
 
 }

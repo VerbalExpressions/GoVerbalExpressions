@@ -168,6 +168,14 @@ func (v *VerbalExpression) Find(s string) *VerbalExpression {
 	return v.add(`(?:` + quote(s) + `)`)
 }
 
+
+// Not invert Find, meaning search something excepting "value". This
+// is different than SomethingBut or AnythingBut that works with a list of
+// caracters
+func (v *VerbalExpression) Not(value string) *VerbalExpression {
+	return v.add(`(?!(` + quote(value) + `))`)
+}
+
 // Alias to Find()
 func (v *VerbalExpression) Then(s string) *VerbalExpression {
 	return v.Find(s)
@@ -318,21 +326,30 @@ func (v *VerbalExpression) Multiple(s string, mults ...int) *VerbalExpression {
 //				Find("foobarbaz").
 //				Or().
 //				Find("footestbaz")
-func (v *VerbalExpression) Or() *VerbalExpression {
-	if strings.Index(v.prefixes, "(") == -1 {
+func (v *VerbalExpression) Or(ve *VerbalExpression) *VerbalExpression {
+	/*if strings.Index(v.prefixes, "(") == -1 {
 		v.prefixes += "(?:"
 	}
 	if strings.Index(v.suffixes, ")") == -1 {
 		v.suffixes = ")" + v.suffixes
-	}
+	}*/
+	v.parts = append(v.parts, strings.Join([]string{ve.Regex().String()}, "")+"|")
 
-	v.parts = append(v.parts, strings.Join([]string{v.prefixes, v.expression, v.suffixes}, "")+"|")
-	v.expression = ""
-	v.prefixes = ""
-	v.suffixes = ""
-	v.compiled = false
 	return v
 }
+
+
+
+func (v *VerbalExpression) And(ve *VerbalExpression) *VerbalExpression{
+	/*if strings.Index(v.prefixes, "(") == -1 {
+		v.prefixes += "(?:"
+	}
+	if strings.Index(v.suffixes, ")") == -1 {
+		v.suffixes = ")" + v.suffixes
+	}*/
+	return v.add("(?:" + ve.Regex().String() + ")")
+}
+
 
 // WithAnyCase asks verbalexpressions to match with or without case sensitivity
 func (v *VerbalExpression) WithAnyCase(sensitive bool) *VerbalExpression {
@@ -365,8 +382,8 @@ func (v *VerbalExpression) Regex() *regexp.Regexp {
 	if !v.compiled {
 		v.regexp = regexp.MustCompile(
 			strings.Join([]string{
-				`(?` + v.getFlags() + `)`,
 				strings.Join(v.parts, ""),
+				`(?` + v.getFlags() + `)`,
 				v.prefixes,
 				v.expression,
 				v.suffixes}, ""))
