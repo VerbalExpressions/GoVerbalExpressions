@@ -255,13 +255,13 @@ func TestCapturingSeveralGroups(t *testing.T) {
 	}
 
 }
-/*
+
 func TestORMethod(t *testing.T) {
 
 	s := "foobarbaz footestbaz foonobaz"
 	expected := []string{"foobarbaz", "footestbaz"}
 
-	v := New().Find("foobarbaz").Or().Find("footestbaz")
+	v := New().Find("foobarbaz").Or(New().Find("footestbaz"))
 	if !v.Test(s) {
 		t.Errorf("%s doesn't match %s", v.Regex(), s)
 	}
@@ -279,7 +279,7 @@ func TestORMethod(t *testing.T) {
 	}
 
 }
-*/
+
 func TestMultipleMethod(t *testing.T) {
 
 	v := New().Multiple("foo")
