@@ -170,8 +170,11 @@ func (v *VerbalExpression) Find(s string) *VerbalExpression {
 
 // Not invert Find, meaning search something excepting "value". This
 // is different than SomethingBut or AnythingBut that works with a list of
-// caracters
-// TODO: doesn't work at this time,
+// caracters. Note that this method is not exactly the same as PCRE system.
+//
+// While PCRE allows: foo(?!bar)baz, "foobarrbaz" matches (note the double r).
+// With our method, this doesn't match. But: "foobarbaz" doen't match (so it's ok).
+// And "fooXXXbaz" matches also.
 func (v *VerbalExpression) Not(value string) *VerbalExpression {
 	//return v.add(`(?!(` + quote(value) + `))`)
 	// because Golang doesn't implement ?!
