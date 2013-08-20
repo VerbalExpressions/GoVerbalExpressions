@@ -519,14 +519,14 @@ func TestToStringMustPanic(t *testing.T) {
 
 }
 
+func TestNotMethod(t *testing.T) {
 
-/*func TestNotMethod(t *testing.T) {
-
-	s:=`
-foobarbaz
+	s := `foobarbaz
 footestbaz
 fooexceptingbaz
 foootherokbaz
+foofoofoo
+foonotcap
 `
 
 	v := New().
@@ -534,17 +534,34 @@ foootherokbaz
 		BeginCapture().
 		Not("excepting").
 		EndCapture().
-		Find("baz")
+		Then("baz")
 	res := v.Captures(s)
 	t.Log(res)
-	t.Log(v.Regex())
+	if len(res) != 3 {
+		t.Errorf("%v is not length 3", res)
+	}
+	for i, r := range res {
+		switch i {
+		case 0:
+			if r[1] != "bar" {
+				t.Errorf("%s is not bar", r)
+			}
+		case 1:
+			if r[1] != "test" {
+				t.Errorf("%s is not bar", r)
+			}
+		case 2:
+			if r[1] != "otherok" {
+				t.Errorf("%s is not bar", r)
+			}
+		}
+	}
 
-}*/
-
+}
 
 func TestAndOrCumulate(t *testing.T) {
 
-	s:=`AB
+	s := `AB
 BC
 AC
 BB
@@ -558,11 +575,10 @@ C
 C
 C`
 
-
 	v1 := New().Find("B")
 	t.Log(v1.Regex())
 	v2 := New().Find("c").WithAnyCase(true).Or(v1) // Find B or C
-	v:= New().Find("A").And(v2) // Find A and (B or C)
+	v := New().Find("A").And(v2)                   // Find A and (B or C)
 
 	t.Log(v.Regex())
 	res := v.Regex().FindAllStringSubmatch(s, -1)

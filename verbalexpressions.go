@@ -65,7 +65,7 @@ func tostring(i interface{}) string {
 func New() *VerbalExpression {
 	r := new(VerbalExpression)
 	r.flags = MULTILINE | GLOBAL
-	r.parts = make([]string, 1)
+	r.parts = make([]string, 0)
 	return r
 }
 
@@ -168,12 +168,26 @@ func (v *VerbalExpression) Find(s string) *VerbalExpression {
 	return v.add(`(?:` + quote(s) + `)`)
 }
 
-
 // Not invert Find, meaning search something excepting "value". This
 // is different than SomethingBut or AnythingBut that works with a list of
 // caracters
+// TODO: doesn't work at this time,
 func (v *VerbalExpression) Not(value string) *VerbalExpression {
-	return v.add(`(?!(` + quote(value) + `))`)
+	//return v.add(`(?!(` + quote(value) + `))`)
+	// because Golang doesn't implement ?!
+	// we create a pseudo negative system...
+
+	runes := []rune(quote(value))
+	parts := make([]string, 0)
+	prev := ""
+	for _, r := range runes {
+		parts = append(parts, prev+"[^"+string(r)+"]")
+		prev += string(r)
+	}
+
+	exp := strings.Join(parts, "|")
+	exp = "(?:" + exp + ")*?"
+	return v.add(exp)
 }
 
 // Alias to Find()
@@ -327,16 +341,13 @@ func (v *VerbalExpression) Multiple(s string, mults ...int) *VerbalExpression {
 //				Or().
 //				Find("footestbaz")
 func (v *VerbalExpression) Or(ve *VerbalExpression) *VerbalExpression {
-	v.parts = append(v.parts, ve.Regex().String() + "|")
+	v.parts = append(v.parts, ve.Regex().String()+"|")
 	return v
 }
 
-
-
-func (v *VerbalExpression) And(ve *VerbalExpression) *VerbalExpression{
+func (v *VerbalExpression) And(ve *VerbalExpression) *VerbalExpression {
 	return v.add("(?:" + ve.Regex().String() + ")")
 }
-
 
 // WithAnyCase asks verbalexpressions to match with or without case sensitivity
 func (v *VerbalExpression) WithAnyCase(sensitive bool) *VerbalExpression {
