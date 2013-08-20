@@ -327,26 +327,13 @@ func (v *VerbalExpression) Multiple(s string, mults ...int) *VerbalExpression {
 //				Or().
 //				Find("footestbaz")
 func (v *VerbalExpression) Or(ve *VerbalExpression) *VerbalExpression {
-	/*if strings.Index(v.prefixes, "(") == -1 {
-		v.prefixes += "(?:"
-	}
-	if strings.Index(v.suffixes, ")") == -1 {
-		v.suffixes = ")" + v.suffixes
-	}*/
-	v.parts = append(v.parts, strings.Join([]string{ve.Regex().String()}, "")+"|")
-
+	v.parts = append(v.parts, ve.Regex().String() + "|")
 	return v
 }
 
 
 
 func (v *VerbalExpression) And(ve *VerbalExpression) *VerbalExpression{
-	/*if strings.Index(v.prefixes, "(") == -1 {
-		v.prefixes += "(?:"
-	}
-	if strings.Index(v.suffixes, ")") == -1 {
-		v.suffixes = ")" + v.suffixes
-	}*/
 	return v.add("(?:" + ve.Regex().String() + ")")
 }
 
