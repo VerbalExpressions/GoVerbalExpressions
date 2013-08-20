@@ -65,7 +65,7 @@ func tostring(i interface{}) string {
 func New() *VerbalExpression {
 	r := new(VerbalExpression)
 	r.flags = MULTILINE | GLOBAL
-	r.parts = make([]string, 1)
+	r.parts = make([]string, 0)
 	return r
 }
 
@@ -166,6 +166,31 @@ func (v *VerbalExpression) StartOfLine() *VerbalExpression {
 // Find seeks string. The string MUST be there (unlike Maybe() method)
 func (v *VerbalExpression) Find(s string) *VerbalExpression {
 	return v.add(`(?:` + quote(s) + `)`)
+}
+
+// Not invert Find, meaning search something excepting "value". This
+// is different than SomethingBut or AnythingBut that works with a list of
+// caracters. Note that this method is not exactly the same as PCRE system.
+//
+// While PCRE allows: foo(?!bar)baz, "foobarrbaz" matches (note the double r).
+// With our method, this doesn't match. But: "foobarbaz" doen't match (so it's ok).
+// And "fooXXXbaz" matches also.
+func (v *VerbalExpression) Not(value string) *VerbalExpression {
+	//return v.add(`(?!(` + quote(value) + `))`)
+	// because Golang doesn't implement ?!
+	// we create a pseudo negative system...
+
+	runes := []rune(quote(value))
+	parts := make([]string, 0)
+	prev := ""
+	for _, r := range runes {
+		parts = append(parts, prev+"[^"+string(r)+"]")
+		prev += string(r)
+	}
+
+	exp := strings.Join(parts, "|")
+	exp = "(?:" + exp + ")*?"
+	return v.add(exp)
 }
 
 // Alias to Find()
@@ -318,20 +343,13 @@ func (v *VerbalExpression) Multiple(s string, mults ...int) *VerbalExpression {
 //				Find("foobarbaz").
 //				Or().
 //				Find("footestbaz")
-func (v *VerbalExpression) Or() *VerbalExpression {
-	if strings.Index(v.prefixes, "(") == -1 {
-		v.prefixes += "(?:"
-	}
-	if strings.Index(v.suffixes, ")") == -1 {
-		v.suffixes = ")" + v.suffixes
-	}
-
-	v.parts = append(v.parts, strings.Join([]string{v.prefixes, v.expression, v.suffixes}, "")+"|")
-	v.expression = ""
-	v.prefixes = ""
-	v.suffixes = ""
-	v.compiled = false
+func (v *VerbalExpression) Or(ve *VerbalExpression) *VerbalExpression {
+	v.parts = append(v.parts, ve.Regex().String()+"|")
 	return v
+}
+
+func (v *VerbalExpression) And(ve *VerbalExpression) *VerbalExpression {
+	return v.add("(?:" + ve.Regex().String() + ")")
 }
 
 // WithAnyCase asks verbalexpressions to match with or without case sensitivity
@@ -365,8 +383,8 @@ func (v *VerbalExpression) Regex() *regexp.Regexp {
 	if !v.compiled {
 		v.regexp = regexp.MustCompile(
 			strings.Join([]string{
-				`(?` + v.getFlags() + `)`,
 				strings.Join(v.parts, ""),
+				`(?` + v.getFlags() + `)`,
 				v.prefixes,
 				v.expression,
 				v.suffixes}, ""))
