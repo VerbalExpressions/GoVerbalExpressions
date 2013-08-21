@@ -14,11 +14,11 @@ import (
 type Flag uint
 
 const (
-	MULTILINE   Flag = 1 << iota
-	IGNORE_CASE Flag = 1 << iota
-	DOTALL      Flag = 1 << iota
-	UNGREEDY    Flag = 1 << iota
-	GLOBAL      Flag = 1 << iota
+	MULTILINE Flag = 1 << iota
+	IGNORE_CASE
+	DOTALL
+	UNGREEDY
+	GLOBAL
 )
 
 // VerbalExpression structure to create expression
