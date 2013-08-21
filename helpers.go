@@ -15,26 +15,6 @@ func (v *VerbalExpression) Replace(src string, dst string) string {
 
 // Returns a slice of results from captures. If you didn't apply BeginCapture() and EnCapture(), the slices
 // will return slice of []string where []string is length 1, and 0 index is the global capture
-//
-// Example:
-//		s:="This should get barsystem and whatever..."
-//		// get "bar" followed by a word
-//		v := verbalexpressions.New().Anything().
-//				BeginCatpure().
-//				Find("bar").Word().
-//				EndCapture()
-//
-//		res := v.Captures(s)
-//		fmt.Println(res)
-//		[
-//			["This should get barsystem", "barsystem"] // 0: global capture, 1: catpure 1
-//		]
-//
-// So, to range results, you can do:
-//		for _, captures := range res {
-//			fmt.Println(captures[1])
-//		}
-// Actualy, 1 matches first group, you can use several captures.
 func (v *VerbalExpression) Captures(s string) [][]string {
 	iter := 1
 	if v.flags&GLOBAL != 0 {
