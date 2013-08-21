@@ -1,5 +1,6 @@
 /*
-This is a Go implementation of VerbalExpressions for other languages. Check https://github.com/VerbalExpressions to know the other implementations.
+This is a Go implementation of VerbalExpressions for other languages.
+Check http://VerbalExpressions.github.io to know the other implementations.
 
 VerbalExperssions is a way to build complex regular expressions with a verbal language.
 

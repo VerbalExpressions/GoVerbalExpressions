@@ -122,10 +122,6 @@ func (v *VerbalExpression) Anything() *VerbalExpression {
 }
 
 // AnythingBut will match anything excpeting the given string.
-// Example:
-//		s := "This is a simple test"
-//		v := verbalexpressions.New().AnythingBut("ie").RegExp().FindAllString(s, -1)
-//		[Th s  s a s mple t st]
 func (v *VerbalExpression) AnythingBut(s string) *VerbalExpression {
 	return v.add(`(?:[^` + quote(s) + `]*)`)
 }
@@ -199,11 +195,6 @@ func (v *VerbalExpression) Then(s string) *VerbalExpression {
 }
 
 // Any accepts caracters to be matched
-//
-// Example:
-//		s := "foo1 foo5 foobar"
-//		v := New().Find("foo").Any("1234567890").Regex().FindAllString(s, -1)
-//		[foo1 foo5]
 func (v *VerbalExpression) Any(s string) *VerbalExpression {
 	return v.add(`(?:[` + quote(s) + `])`)
 }
@@ -225,12 +216,6 @@ func (v *VerbalExpression) Br() *VerbalExpression {
 
 // Range accepts an even number of arguments. Each pair of values defines start and end of range.
 // Think like this: Range(from, to [, from, to ...])
-//
-// Example:
-//		s := "This 1 is 55 a TEST"
-//		v := verbalexpressions.New().Range("a","z",0,9)
-//		res := v.Regex().FindAllString()
-//		[his 1 is 55 a]
 func (v *VerbalExpression) Range(args ...interface{}) *VerbalExpression {
 	if len(args)%2 != 0 {
 		log.Panicf("Range: not even args number")
@@ -336,18 +321,14 @@ func (v *VerbalExpression) Multiple(s string, mults ...int) *VerbalExpression {
 	return v.add("(?:" + quote(s) + ")" + mult)
 }
 
-// Or, chains a alternate expression
-//
-// Example:
-//		v := Verbalexpression.New().
-//				Find("foobarbaz").
-//				Or().
-//				Find("footestbaz")
+// Or, chains an alternative VerbalExpression
 func (v *VerbalExpression) Or(ve *VerbalExpression) *VerbalExpression {
 	v.parts = append(v.parts, ve.Regex().String()+"|")
 	return v
 }
 
+// Add another VerbalExpression to the current.
+// Usefull to concatenate several complex search patterns
 func (v *VerbalExpression) And(ve *VerbalExpression) *VerbalExpression {
 	return v.add("(?:" + ve.Regex().String() + ")")
 }
