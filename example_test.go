@@ -2,7 +2,7 @@ package verbalexpressions_test
 
 import (
 	"fmt"
-	verbalexpressions "github.com/VerbalExpressions/GoVerbalExpressions"
+	"github.com/VerbalExpressions/GoVerbalExpressions"
 )
 
 func ExampleVerbalExpression_Find() {
