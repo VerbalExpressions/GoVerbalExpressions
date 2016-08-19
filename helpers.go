@@ -13,7 +13,7 @@ func (v *VerbalExpression) Replace(src string, dst string) string {
 	return v.Regex().ReplaceAllString(src, dst)
 }
 
-// Returns a slice of results from captures. If you didn't apply BeginCapture() and EnCapture(), the slices
+// Returns a slice of results from captures. If you didn't apply BeginCapture() and EndCapture(), the slices
 // will return slice of []string where []string is length 1, and 0 index is the global capture
 func (v *VerbalExpression) Captures(s string) [][]string {
 	iter := 1
